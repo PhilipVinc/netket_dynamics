@@ -1,0 +1,10 @@
+include LICENSE
+include README.md
+
+prune .github
+prune conf
+prune docs
+prune Notes
+prune Tutorials
+
+exclude codecov.yml

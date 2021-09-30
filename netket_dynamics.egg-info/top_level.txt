@@ -1,0 +1,3 @@
+netket_dynamics
+ode4jax
+pytreearray
