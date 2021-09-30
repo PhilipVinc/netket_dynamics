@@ -56,4 +56,3 @@ te = nkx.TimeEvolution(ha1, variational_state=vs, sr=sr, solver=solver)
 
 log = nk.logging.JsonLog("example_ising1d_TE")
 te.run(1.0, out=log, show_progress=True, obs={"SX": Sx})
-

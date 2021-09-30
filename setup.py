@@ -28,11 +28,11 @@ BASE_DEPENDENCIES = [
 
 setup(
     name="netket-dynamics",
-    author="Giuseppe Carleo et al.",
+    author="Filippo Vicentini et al.",
     url="http://github.com/netket/netket",
-    author_email="netket@netket.org",
+    author_email="filippovicentini@gmail.com",
     license="Apache 2.0",
-    summmary="Netket : Machine Learning techniques for many-body quantum systems.",
+    description="Netket : Machine Learning techniques for many-body quantum systems.",
     long_description="""NetKet is an open-source project delivering cutting-edge
          methods for the study of many-body quantum systems with artificial
          neural networks and machine learning techniques.""",
@@ -46,7 +46,7 @@ setup(
         "Operating System :: Unix",
         "Topic :: Scientific/Engineering :: Physics",
     ],
-    packages=find_packages("src"),
+    packages=find_packages(exclude="test"),
     install_requires=BASE_DEPENDENCIES,
     python_requires=">=3.7",
     extras_require={

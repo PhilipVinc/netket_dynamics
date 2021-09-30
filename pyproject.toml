@@ -18,7 +18,7 @@ requires = ["setuptools>=50",
             "setuptools_scm_git_archive"]
 
 [tool.setuptools_scm]
-write_to = "src/netket_dynamics/_version.py"
+write_to = "netket_dynamics/_version.py"
 
 
 # Development tools
@@ -47,7 +47,7 @@ branch = true
 parallel = true
 concurrency = ["multiprocessing"]
 command_line = "-m pytest --verbose test"
-source = ["netket"]
+source = ["netket_dynamics", "ode4jax", "pytreearray"]
 
 [tool.pytest.ini_options]
 addopts = "--color=yes --verbose --durations=0 -n auto"
@@ -92,10 +92,6 @@ pyflakes = ["-*"]           # disable a plugin
 # match by glob
 [tool.flakehell.exceptions."**/__init__.py"]
 pyflakes = ["-F401"]
-pycodestyle = ["-F401", "-E402"]
-
-[tool.flakehell.exceptions."netket/nn/"]
-pyflakes = ["-F401", "-F403", "-F405"]
 pycodestyle = ["-F401", "-E402"]
 
 # ignore on docs

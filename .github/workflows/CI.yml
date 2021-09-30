@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python-version: 3.8
+            mpi: ""
+            doctest: true
+
+          - os: ubuntu-latest
+            python-version: 3.9
+            mpi: "mpich"
+            main_tests: true
+
+          - os: macos-latest
+            python-version: 3.8
+            mpi: "mpich"
+            main_tests: true
+
+          - os: ubuntu-latest
+            python-version: 3.7
+            mpi: ""
+            main_tests: true
+
+        #python-version: [3.6, 3.7, 3.8]
+        #os: [ubuntu-latest, macos-latest]
+
+    env:
+      MPICH_INTERFACE_HOSTNAME: localhost
+      USE_MPI: ${{ matrix.mpi }} 
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install MPI
+        if: matrix.mpi != ''
+        run: |
+          sh ./conf/travis-install-mpi.sh ${{ matrix.mpi }}
+
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install wheel
+          echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: Pip install packages
+        run: |
+          pip install jaxlib
+          if [ -z "${{ matrix.mpi }}" ]; then
+            pip install -e ".[dev]"
+          else
+            pip install -e ".[dev, mpi]"
+          fi
+
+      - name: Netket tests
+        if: ${{ matrix.main_tests }}
+        run : |
+          export NETKET_EXPERIMENTAL=1
+          pytest --cov=netket --cov-append test
+
+      - name: NetKet docstring tests
+        if: ${{ matrix.doctest }}
+        run: |
+          pytest --doctest-continue-on-failure --doctest-modules netket/
+
+      - name: MPI tests
+        if: matrix.mpi != '' 
+        run: |
+          mpirun -host localhost:2 -np 2 coverage run -m pytest -n 0 test
+          coverage combine --append
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1

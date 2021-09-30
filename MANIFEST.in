@@ -6,5 +6,7 @@ prune conf
 prune docs
 prune Notes
 prune Tutorials
+prune test
 
 exclude codecov.yml
+exclude test
