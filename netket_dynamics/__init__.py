@@ -12,17 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# enable x64 on jax
-# must be done at 0 startup.
-from jax.config import config
+from ode4jax.algorithms import *
 
-config.update("jax_enable_x64", True)
-del config
-
-from ._version import version as __version__  # noqa: F401
-
-from . import dynamics
-from . import dynamics2
-
-from .dynamics import TimeEvolution
-from .dynamics2 import TimeEvolution as TimeEvolution2
+from ._driver import TimeEvolution
