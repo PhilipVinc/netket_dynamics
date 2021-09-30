@@ -69,7 +69,7 @@ def perform_step(
     p = integrator.p
     t = integrator.t
     dt = integrator.dt
-    u_t = integrator.u
+    u_t = integrator.uprev
 
     tableau = alg.tableau
 

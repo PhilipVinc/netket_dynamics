@@ -31,14 +31,9 @@ from netket.operator import AbstractOperator
 from netket.driver.abstract_variational_driver import AbstractVariationalDriver
 from netket.driver.vmc_common import info
 from netket.vqs import VariationalState, MCState, MCMixedState
-from netket.stats import Stats
 from netket.optimizer.qgt import QGTAuto
-from netket.utils import warn_deprecation
 
-from netket.experimental import ode4jax
-
-from jax.experimental import host_callback as hcb
-
+import ode4jax
 
 # self is driver
 @singledispatch

@@ -7,7 +7,7 @@ from netket.utils.types import Array, PyTree
 
 @struct.dataclass(_frozen=False)
 class ODESolution:
-    u: list
+    _u: list
     """
 	History PyTree of the objects that are stored. The leading dimension is the dimension
 	of the time
@@ -22,9 +22,17 @@ class ODESolution:
 	Last id stored
 	"""
 
+    @property
+    def u(self):
+        """
+        History PyTree of the objects that are stored. The leading dimension is the dimension
+        of the time
+        """
+        return self._u.tree
+
     def set(self, iter_count, t, val):
         self.t = self.t.at[iter_count].set(t)
-        self.u = self.u.at[iter_count].set(val)
+        self._u = self._u.at[iter_count].set(val)
         self.last_id = iter_count
 
     @staticmethod
@@ -40,4 +48,4 @@ class ODESolution:
 
     def compress(self):
         self.t = self.t.at[0 : self.last_id].get()
-        self.u = self.u.at[0 : self.last_id].get()
+        self._u = self._u.at[0 : self.last_id].get()

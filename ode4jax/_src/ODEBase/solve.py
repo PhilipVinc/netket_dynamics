@@ -247,7 +247,7 @@ def loopfooter(integrator: ODEIntegrator):
             integrator
         )  # forcedttmin
 
-        # if accept
+        # if accept_step:
         def accept_fun(integrator):
             dtnew = integrator.opts.controller.step_accept_controller(
                 integrator, integrator.alg, q
@@ -306,7 +306,7 @@ def saveat(integrator):
     # TODO: this only handles one saved point per time-step.
     # in principle there could be more than one
     next_save_t = integrator.opts.saveat[integrator.opts.next_saveat_id]
-    cond = next_save_t <= integrator.t
+    cond = next_save_t <= integrator.t + 2*jnp.finfo(float).eps
 
     def do_save_body(solution):
         curt = integrator.tdir * next_save_t
@@ -316,9 +316,11 @@ def saveat(integrator):
         # k = addsteps(integrator)
         theta = (curt - integrator.tprev) / integrator.dt
         idxs = 0  # integrator.opts.save_idxs
-        val = ode_interpolant(theta, integrator, idxs, 0)
+        save_val = ode_interpolant(theta, integrator, idxs, 0)
         solution = solution.replace()
-        solution.set(integrator.saveiter, curt, val)
+
+        solution.set(integrator.saveiter, curt, save_val)
+        #solution.set(integrator.saveiter, integrator.t, integrator.u)
 
         # if integrator.t == curt then
         # solution = solution.replace()

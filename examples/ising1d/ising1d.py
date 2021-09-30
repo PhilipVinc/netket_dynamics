@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import netket as nk
-import netket.experimental as nkx
+import netket_dynamics as nkd
+
+import matplotlib.pyplot as plt
 
 # 1D Lattice
 L = 20  # 10
@@ -49,10 +51,11 @@ Sx = sum([nk.operator.spin.sigmax(hi, i) for i in range(L)])
 gs.run(n_iter=150, out="example_ising1d_GS", obs={"Sx": Sx})
 
 # Create solver for time propagation
-solver = nkx.dynamics.Heun(dt=0.01)
-
 ha1 = nk.operator.Ising(hilbert=hi, graph=g, h=0.5)
-te = nkx.TimeEvolution(ha1, variational_state=vs, sr=sr, solver=solver)
+te = nkd.TimeEvolution(ha1, variational_state=vs, algorithm=nkd.Euler(), dt=0.01)
 
 log = nk.logging.JsonLog("example_ising1d_TE")
 te.run(1.0, out=log, show_progress=True, obs={"SX": Sx})
+
+plt.plot(log.data['t'], log.data['SX'])
+plt.show()
