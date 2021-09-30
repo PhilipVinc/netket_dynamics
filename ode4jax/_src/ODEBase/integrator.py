@@ -236,11 +236,13 @@ def _init(
         _saveat = jnp.asarray(saveat)
 
     if save_everystep is True and adaptive:
-        raise ValueError("""
+        raise ValueError(
+            """
                          Cannot use `save_everystep=True` if the algorithm is adaptive,
                          because the number of iterations is unknown and we cannot allocate
                          output arrays in jax-jitted contexts. 
-                         """)
+                         """
+        )
     elif save_everystep is None:
         if not adaptive:
             save_everystep = len(_saveat) == 0
@@ -293,8 +295,9 @@ def _init(
     solution = ODESolution.make(u, n_saved_pts)
 
     k = expand_dim(u, 2)
-    
-    EEst = jnp.zeros_like(errornorm(
+
+    EEst = jnp.zeros_like(
+        errornorm(
             u,
             u,
             u,
@@ -302,8 +305,8 @@ def _init(
             opts.reltol,
             opts.internalnorm,
             t,
-        ))
-
+        )
+    )
 
     return ODEIntegrator(
         solution=solution,

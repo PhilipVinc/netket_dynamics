@@ -306,7 +306,7 @@ def saveat(integrator):
     # TODO: this only handles one saved point per time-step.
     # in principle there could be more than one
     next_save_t = integrator.opts.saveat[integrator.opts.next_saveat_id]
-    cond = next_save_t <= integrator.t + 2*jnp.finfo(float).eps
+    cond = next_save_t <= integrator.t + 2 * jnp.finfo(float).eps
 
     def do_save_body(solution):
         curt = integrator.tdir * next_save_t
@@ -320,7 +320,7 @@ def saveat(integrator):
         solution = solution.replace()
 
         solution.set(integrator.saveiter, curt, save_val)
-        #solution.set(integrator.saveiter, integrator.t, integrator.u)
+        # solution.set(integrator.saveiter, integrator.t, integrator.u)
 
         # if integrator.t == curt then
         # solution = solution.replace()

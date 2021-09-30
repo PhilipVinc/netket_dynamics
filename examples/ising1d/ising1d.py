@@ -57,5 +57,5 @@ te = nkd.TimeEvolution(ha1, variational_state=vs, algorithm=nkd.Euler(), dt=0.01
 log = nk.logging.JsonLog("example_ising1d_TE")
 te.run(1.0, out=log, show_progress=True, obs={"SX": Sx})
 
-plt.plot(log.data['t'], log.data['SX'])
+plt.plot(log.data["t"], log.data["SX"])
 plt.show()

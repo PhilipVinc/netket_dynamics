@@ -27,17 +27,20 @@ class Euler(AbstractODERKAlgorithm):
     def tableau(self):
         return tableau.bt_feuler
 
+
 @struct.dataclass
 class Midpoint(AbstractODERKAlgorithm):
     @property
     def tableau(self):
         return tableau.bt_midpoint
 
+
 @struct.dataclass
 class Heun(AbstractODERKAlgorithm):
     @property
     def tableau(self):
         return tableau.bt_heun
+
 
 @struct.dataclass
 class RK4(AbstractODERKAlgorithm):
@@ -48,11 +51,13 @@ class RK4(AbstractODERKAlgorithm):
 
 ## adaptive methods
 
+
 @struct.dataclass
 class RK12(AbstractODERKAlgorithm):
     @property
     def tableau(self):
         return tableau.bt_rk12
+
 
 @struct.dataclass
 class RK23(AbstractODERKAlgorithm):
@@ -60,11 +65,13 @@ class RK23(AbstractODERKAlgorithm):
     def tableau(self):
         return tableau.bt_rk23
 
+
 @struct.dataclass
 class RK4Fehlberg(AbstractODERKAlgorithm):
     @property
     def tableau(self):
         return tableau.bt_rk4_fehlberg
+
 
 @struct.dataclass
 class RK45(AbstractODERKAlgorithm):
