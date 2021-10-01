@@ -20,22 +20,30 @@ from builtins import RuntimeError, next
 from functools import partial
 from typing import Callable, Optional, Tuple, Type
 
+import numpy as np
 import jax
 import jax.numpy as jnp
 
 from netket.utils import struct
 from netket.utils.types import Array, PyTree
 
-dtype = jnp.float64
+from .solution import AbstractSolution
+from .options import AbstractDEOptions
 
+dtype = jnp.float64
 
 @struct.dataclass(_frozen=False)
 class AbstractIntegrator:
-    def step(self):
-        """
-        Performs one step of integration
-        """
-        raise NotImplementedError("Integrator stepping is not implemented")
+    solution: AbstractSolution
+    opts: AbstractDEOptions
+
+    force_stepfail: bool
+    error_code: int
+
+    @jax.jit
+    def solve(self):
+        from .api import solve
+        return solve(self)
 
     def du(self):
         """
@@ -72,8 +80,21 @@ class AbstractIntegrator:
         """
         raise NotImplementedError
 
-    def add_stop(self, t):
-        raise NotImplementedError
+    def add_tstop(self, t):
+        eps = 2*jnp.finfo(self.t).eps
+
+        if t <= (self.t + eps):
+            return 
+        elif not self.has_tstops:
+            self.opts.tstops = jnp.asarray(np.insert(self.opts.tstops, self.opts.next_tstop_id, t))
+        elif t<=self.first_tstop:
+            if np.abs(t-self.first_tstop) < eps:
+                # ignore
+                return
+            self.opts.tstops = jnp.asarray(np.insert(self.opts.tstops, self.opts.next_tstop_id, t))
+        else:
+            self.opts.tstops = jnp.asarray(np.insert(self.opts.tstops, np.searchsorted(self.opts.tstops, t), t))
+
 
     def add_saveat(self, t):
         raise NotImplementedError
@@ -88,3 +109,56 @@ class AbstractIntegrator:
         """
         resets the integrator
         """
+        raise NotImplementedError
+
+    @property
+    def has_tstops(self):
+        return self.opts.next_tstop_id < self.opts.tstops.size
+
+    @property
+    def first_tstop(self):
+        return self.opts.tstops[self.opts.next_tstop_id]
+
+
+    # ITERATOR INTERFACE
+    @property
+    def done(self):
+        is_solving = self.has_tstops
+        no_error = jnp.logical_not(self.error_code)
+
+        return jnp.logical_not(jnp.logical_and(is_solving, no_error))
+
+    @jax.jit
+    def step(self, dt=None):
+        """
+        Performs one step of integration
+        """
+        from .api import step
+        if dt is None:
+            return step(self)
+        else:
+            return step(self, dt)
+
+    def __iter__(self):
+        return _IteratorWrapper(self)
+
+class _IteratorWrapper:
+    """
+    Wrapper to update the state during iteration
+    """
+    def __init__(self, integrator):
+        self.integrator = integrator
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        it = self.integrator
+        if it.done:
+            raise StopIteration
+        else:
+            it = it.step()
+            self.integrator = it
+
+            return (it.t, it.u)
+

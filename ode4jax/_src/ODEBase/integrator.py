@@ -50,6 +50,7 @@ class ODEIntegrator(AbstractIntegrator):
     """
 
     solution: AbstractSolution
+
     u: PyTree
     k: PyTree
     uprev: PyTree
@@ -68,25 +69,14 @@ class ODEIntegrator(AbstractIntegrator):
     iter: int
     alg: AbstractODEAlgorithm
     success_iter: int
-    opts: DEOptions
     saveiter: int
     saveiter_dense: int
     f: Callable = struct.field(pytree_node=False)
     p: Any
-    force_stepfail: bool
-    error_code: int
 
     cache: Any
 
     # progress: bool = struct.field(pytree_node=False)
-
-    @property
-    def has_tstops(self):
-        return self.opts.next_tstop_id < self.opts.tstops.size
-
-    @property
-    def first_tstop(self):
-        return self.opts.tstops[self.opts.next_tstop_id]
 
 
 @dispatch
@@ -284,6 +274,7 @@ def _init(
         qmin=qmin,
         qmax=qmax,
         gamma=gamma,
+        stop_at_next_tstop=jnp.array(False, dtype=bool),
     )
 
     if alg.uses_uprev(adaptive):

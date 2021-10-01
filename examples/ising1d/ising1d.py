@@ -49,10 +49,13 @@ Sx = sum([nk.operator.spin.sigmax(hi, i) for i in range(L)])
 
 # Run the optimization for 300 iterations
 gs.run(n_iter=150, out="example_ising1d_GS", obs={"Sx": Sx})
+W_0 = vs.parameters
+ket_0 = vs.to_qobj()
 
 # Create solver for time propagation
 ha1 = nk.operator.Ising(hilbert=hi, graph=g, h=0.5)
-te = nkd.TimeEvolution(ha1, variational_state=vs, algorithm=nkd.Euler(), dt=0.01)
+vs.parameters = W_0
+te = nkd.TimeEvolution(ha1, variational_state=vs, algorithm=nkd.RK4(), dt=0.01)
 
 log = nk.logging.JsonLog("example_ising1d_TE")
 te.run(1.0, out=log, show_progress=True, obs={"SX": Sx})

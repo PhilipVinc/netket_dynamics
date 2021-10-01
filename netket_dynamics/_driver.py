@@ -170,7 +170,7 @@ class TimeEvolution(AbstractVariationalDriver):
         """
         return self._algorithm
 
-    def _odefun(self, w, p, t, **_):
+    def _odefun(self, w, p, t, **s):
         """
         The ODE determining the dynamics passed to scipy solvers.
 
@@ -188,10 +188,7 @@ class TimeEvolution(AbstractVariationalDriver):
 
         return flax.core.unfreeze(Δw)
 
-    def step(self):
-        self._integrator = ode4jax.step(self._integrator)
-
-    def advance(self, t_end=None, n_steps=None):
+    def advance(self, dt=None, n_steps=None):
         """
         Advance the time propagation by `n_steps` simulation steps
         of duration `self.dt`.
@@ -199,22 +196,21 @@ class TimeEvolution(AbstractVariationalDriver):
            Args:
                :n_steps (int): No. of steps to advance.
         """
-        if (t_end is None and n_steps is None) or (
-            t_end is not None and n_steps is not None
+        if (dt is None and n_steps is None) or (
+            dt is not None and n_steps is not None
         ):
             raise ValueError("Both specified")
 
         if n_steps is not None:
             for i in range(n_steps):
-                self.step()
-        elif t_end is not None:
-            while self._integrator.t < t_end:
-                self.step()
+                self._integrator = jstep(self._integrator)
+        elif dt is not None:
+            self._integrator = jstep(self._integrator, dt)
 
         # if self._integrator.status == "failed":
         #    raise ...
 
-    def iter(self, delta_t, t_interval=1e-10):
+    def iter(self, delta_t, t_interval=None):
         """
         Returns a generator which advances the time evolution in
         steps of `step` for a total of `n_iter` times.
@@ -228,14 +224,10 @@ class TimeEvolution(AbstractVariationalDriver):
         """
         t_end = self.t + delta_t
         while self.t < t_end:  # and self._integrator.status == "running":
-            _step_end = self.t + t_interval
             t0 = self.t
-            while self.t <= _step_end:  # and self._integrator.status == "running":
-                if self.t == t0:
-                    yield self.t
-
-                self._step_count += 1
-                self.step()
+            yield self.t
+            self._step_count += 1
+            self._integrator = jstep(self._integrator, t_interval)
 
     def _log_additional_data(self, obs, step):
         obs["t"] = self.t
@@ -243,7 +235,7 @@ class TimeEvolution(AbstractVariationalDriver):
     @property
     def _default_step_size(self):
         # Essentially means
-        return 1e-20
+        return None
 
     @property
     def step_value(self):

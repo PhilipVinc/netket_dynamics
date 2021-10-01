@@ -25,36 +25,11 @@ import jax.numpy as jnp
 from netket.utils import struct
 from netket.utils.types import Array, PyTree
 
-from ode4jax.base import AbstractDEOptions
-
 dtype = jnp.float64
 
 
 @struct.dataclass(_frozen=False)
-class DEOptions(AbstractDEOptions):
-    abstol: float
-    reltol: float
-
-    saveat: Any
-    next_saveat_id: int
-
-    dtmin: float
-    dtmax: float
-
-    internalnorm: Any = struct.field(pytree_node=False)
-    errornorm: Any = struct.field(pytree_node=False)
-
-    controller: Any
-    qsteady_min: float
-    qsteady_max: float
-    qoldinit: float
-    qmax: float
-    qmin: float
-    gamma: float
-
-    save_start: bool = struct.field(pytree_node=False, default=False)
-    save_end: bool = struct.field(pytree_node=False, default=False)
-    maxiters: int = struct.field(pytree_node=False, default=0)
-    save_everystep: bool = struct.field(pytree_node=False, default=False)
-
-    adaptive: bool = struct.field(pytree_node=False, default=True)
+class AbstractDEOptions:
+    tstops: Any
+    next_tstop_id: int
+    stop_at_next_tstop: bool

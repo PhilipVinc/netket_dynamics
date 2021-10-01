@@ -266,7 +266,6 @@ class AbstractVariationalDriver(abc.ABC):
             first_step = True
 
             for step in self.iter(n_iter, step_size):
-
                 log_data = self.estimate(obs)
 
                 # if the cost-function is defined then report it in the progress bar

@@ -10,7 +10,7 @@ import jax.numpy as jnp
 
 from jax.experimental import host_callback as hcb
 
-from ode4jax.base import init
+from ode4jax.base import init, postamble
 
 from .problem import ODEProblem
 from .integrator import ODEIntegrator
@@ -19,10 +19,16 @@ from .algorithms import AbstractODEAlgorithm, perform_step
 
 @dispatch
 def _solve(problem: ODEProblem, alg: AbstractODEAlgorithm, *args, **kwargs):
+    integrator = init(problem, alg, *args, **kwargs)
+
+    integrator = _solve(integrator)
+
+    return integrator.solution
+
+@dispatch
+def _solve(integrator: ODEIntegrator):
     def cond_fun(integrator):
-        is_solving = integrator.t < problem.tspan[1]
-        not_errored = jnp.logical_not(integrator.error_code)
-        return jnp.logical_and(is_solving, not_errored)
+        return jnp.logical_not(integrator.done)
 
     def while_fun(integrator):
         # def _cond_fun(integrator):
@@ -38,11 +44,9 @@ def _solve(problem: ODEProblem, alg: AbstractODEAlgorithm, *args, **kwargs):
         # integrator = handle_tstop(integrator)
         return _step(integrator)
 
-    integrator = init(problem, alg, *args, **kwargs)
-
     integrator = jax.lax.while_loop(cond_fun, while_fun, integrator)
 
-    # postamble(integrator)
+    integrator = postamble(integrator)
 
     return integrator.solution
 
@@ -306,7 +310,7 @@ def saveat(integrator):
     # TODO: this only handles one saved point per time-step.
     # in principle there could be more than one
     next_save_t = integrator.opts.saveat[integrator.opts.next_saveat_id]
-    cond = next_save_t <= integrator.t + 2 * jnp.finfo(float).eps
+    cond = next_save_t <= integrator.t + 2 * jnp.finfo(integrator.t.dtype).eps
 
     def do_save_body(solution):
         curt = integrator.tdir * next_save_t

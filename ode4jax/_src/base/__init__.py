@@ -1,6 +1,7 @@
 __all__ = [
     "AbstractProblem",
     "AbstractIntegrator",
+    "AbstractDEOptions",
     "AbstractSolution",
     "AbstractAlgorithm",
     "AbstractFunction",
@@ -8,6 +9,7 @@ __all__ = [
     "solve",
     "init",
     "step",
+    "postamble",
     "_solve",
     "_init",
     "_initialize",
@@ -20,12 +22,13 @@ __all__ = [
 
 
 from .problem import AbstractProblem
+from .options import AbstractDEOptions
 from .integrator import AbstractIntegrator
 
 from .solution import AbstractSolution
 from .solver import AbstractAlgorithm, alg_cache
 
-from .api import solve, init, step, _solve, _init, _initialize, _step
+from .api import solve, init, step, postamble, _solve, _init, _initialize, _step
 
 from .residuals import calculate_error, calculate_residuals, default_norm
 
