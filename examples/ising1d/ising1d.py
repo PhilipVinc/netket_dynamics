@@ -16,9 +16,10 @@ import netket as nk
 import netket_dynamics as nkd
 
 import matplotlib.pyplot as plt
+plt.ion()
 
 # 1D Lattice
-L = 20  # 10
+L = 10  # 10
 
 g = nk.graph.Hypercube(length=L, n_dim=1, pbc=True)
 
@@ -55,10 +56,25 @@ ket_0 = vs.to_qobj()
 # Create solver for time propagation
 ha1 = nk.operator.Ising(hilbert=hi, graph=g, h=0.5)
 vs.parameters = W_0
-te = nkd.TimeEvolution(ha1, variational_state=vs, algorithm=nkd.RK4(), dt=0.01)
+te = nkd.TimeEvolution(ha1, variational_state=vs, algorithm=nkd.Euler(), dt=0.005)
 
 log = nk.logging.JsonLog("example_ising1d_TE")
 te.run(1.0, out=log, show_progress=True, obs={"SX": Sx})
 
 plt.plot(log.data["t"], log.data["SX"])
+plt.show()
+
+
+## try to compute the exact slope
+import qutip
+import numpy as np
+
+tvals = np.arange(0.0, 1.0, 0.01)
+sol = qutip.sesolve(ha1.to_qobj(), ket_0, tvals, e_ops=[Sx.to_qobj()])
+
+plt.plot(sol.times, sol.expect[0], label="Exact")
+plt.plot(log.data["t"], log.data["SX"], label="NetKet")
+plt.xlabel("time t")
+plt.ylabel("⟨Sx⟩")
+plt.legend()
 plt.show()
