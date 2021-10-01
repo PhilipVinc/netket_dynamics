@@ -241,6 +241,7 @@ class PyTreeArray:
         return self.replace(tree=tree)
 
     def sum(self, axis=0, keepdims=None):
+        # TODO make it consistent w/ numpy
         # for vectors only for now
         assert self.treedef_l == _arr_treedef
         tree = jax.tree_map(partial(jnp.sum, axis=axis, keepdims=keepdims), self.tree)
