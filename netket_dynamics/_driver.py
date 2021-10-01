@@ -28,7 +28,7 @@ from jax.tree_util import tree_map
 import netket.jax as nkjax
 
 from netket.operator import AbstractOperator
-from netket.driver.abstract_variational_driver import AbstractVariationalDriver
+from ._abstract_variational_driver import AbstractVariationalDriver
 from netket.driver.vmc_common import info
 from netket.vqs import VariationalState, MCState, MCMixedState
 from netket.optimizer.qgt import QGTAuto
