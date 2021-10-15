@@ -16,10 +16,9 @@ import netket as nk
 import netket_dynamics as nkd
 
 import matplotlib.pyplot as plt
-plt.ion()
 
 # 1D Lattice
-L = 10  # 10
+L = 10
 
 g = nk.graph.Hypercube(length=L, n_dim=1, pbc=True)
 
