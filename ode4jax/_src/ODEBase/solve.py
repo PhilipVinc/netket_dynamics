@@ -20,10 +20,7 @@ from .algorithms import AbstractODEAlgorithm, perform_step
 @dispatch
 def _solve(problem: ODEProblem, alg: AbstractODEAlgorithm, *args, **kwargs):
     integrator = init(problem, alg, *args, **kwargs)
-
-    integrator = _solve(integrator)
-
-    return integrator.solution
+    return _solve(integrator)
 
 @dispatch
 def _solve(integrator: ODEIntegrator):

@@ -4,8 +4,6 @@ import jax.numpy as jnp
 
 from matplotlib import pyplot as plt
 
-plt.ion()
-
 
 def f(u, pars, t, **_):
     return 1.01 * u
