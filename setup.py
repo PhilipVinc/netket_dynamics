@@ -22,7 +22,7 @@ BASE_DEPENDENCIES = [
     "jaxlib>=0.1.69",
     "flax>=0.3.0, <0.4",
     "orjson~=3.4",
-    "optax>=0.0.2, <0.0.10",
+    "optax>=0.0.2, <0.1.1",
     "netket>=3.0",
 ]
 
