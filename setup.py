@@ -20,7 +20,7 @@ BASE_DEPENDENCIES = [
     "python-igraph~=0.9",
     "jax>0.2.16, <0.2.26",
     "jaxlib>=0.1.69",
-    "flax>=0.3.0, <0.4",
+    "flax>=0.3.0, <0.5",
     "orjson~=3.4",
     "optax>=0.0.2, <0.1.1",
     "netket>=3.0",
