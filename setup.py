@@ -16,7 +16,7 @@ BASE_DEPENDENCIES = [
     "scipy~=1.5",
     "tqdm~=4.56",
     "plum-dispatch~=1.5.1",
-    "numba>=0.52, <0.55",
+    "numba>=0.52, <0.57",
     "python-igraph~=0.9",
     "jax>0.2.16, <0.2.26",
     "jaxlib>=0.1.69",
